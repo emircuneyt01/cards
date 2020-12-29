@@ -21,6 +21,7 @@ By joining us;
 
 -You can help the tech community!
 
-<a class="github-button" href="https://github.com/sharu725/cards" data-style="mega" data-count-href="/sharu725/cards/stargazers" data-count-api="/repos/sharu725/cards#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star sharu725/cards on GitHub">Star</a>
+We are looking forward your mails.
 
-<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+**HackedButHow**
