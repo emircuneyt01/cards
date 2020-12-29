@@ -37,7 +37,7 @@ img {
 .navbar-brand {
   font-weight: 900;
   font-size: 1.85em;
-  color: #6e6e6e;
+  color: #6e6e6e !important;
   padding: 10px;
   margin-left: 15px !important;
   @media screen and (max-width: $on-palm) {
