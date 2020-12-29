@@ -8,15 +8,14 @@ body {
   background-color: #111111 !important;
   color: #6e6e6e !important;
   border-radius: 0;
-  border-bottom: 11px solid #eee;
+  border-bottom: 1px solid #eee;
 }
 
 .navbar-light .navbar-nav .nav-link {
     color: #6e6e6e;
+  &:hover{color: white;}
 }
-.navbar-nav > a:hover {color: white; !important}
-.navbar-link > a:hover {color: white; !important}
-.navbar-light > a:hover {color: white; !important}
+
 
 
 img {
