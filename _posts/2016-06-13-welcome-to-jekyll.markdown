@@ -17,10 +17,15 @@ Current updates about this security bug already released. Organizations should u
 These are the latest versions that you can update;
 
 -2019.4 HF 6 
+
 -2020.2.1 HF 2
+
 -2019.2 SUPERNOVA Patch
+
 -2018.4 SUPERNOVA Patch
+
 -2018.2 SUPERNOVA Patch
+
 
 Here is the POC code:
 Credit: [0xsha's Github Page]: https://gist.github.com/0xsha/75616ef6f24067c4fb5b320c5dfa4965
@@ -159,4 +164,5 @@ else:
 References;
 
 https://us-cert.cisa.gov/ncas/current-activity/2020/12/13/active-exploitation-solarwinds-software
+
 https://cyber.dhs.gov/ed/21-01/
