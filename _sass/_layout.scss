@@ -14,9 +14,9 @@ body {
 .navbar-light .navbar-nav .nav-link {
     color: #6e6e6e;
 }
-.navbar-nav a:hover {color: white;}
-.navbar-link a:hover {color: white;}
-.navbar-light a:hover {color: white;}
+.navbar-nav > a:hover {color: white;}
+.navbar-link > a:hover {color: white;}
+.navbar-light > a:hover {color: white;}
 
 
 img {
