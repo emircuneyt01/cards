@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Write with us!
-permalink: /about/
+permalink: /contact/
 ---
 
 We are looking for writers who wants to share their articles about news around the world.
