@@ -28,7 +28,7 @@ These are the latest versions that you can update;
 
 
 Here is the POC code:
-Credit: [0xsha's Github Page]: https://gist.github.com/0xsha/75616ef6f24067c4fb5b320c5dfa4965
+Credit:  https://gist.github.com/0xsha/75616ef6f24067c4fb5b320c5dfa4965
 
 {% highlight python %}
 # CVE-2020-10148  (local file disclosure PoC for SolarWinds Orion aka door to SuperNova ? )
