@@ -8,7 +8,6 @@ body {
   border-radius: 0;
   border-bottom: 1px solid #eee;
   background-color: #111111;
-  color: white;
 }
 
 img {
@@ -39,8 +38,6 @@ img {
   font-weight: 900;
   font-size: 1.85em;
   padding: 10px;
-  background-color: #111111;
-  color: white;
   margin-left: 15px !important;
   @media screen and (max-width: $on-palm) {
     font-size: 1.5em;
