@@ -33,11 +33,11 @@ paginate: 6
 paginate_path: /page:num/
 
 # Tracker
-analytics: UA-83979019-1
+analytics: G-7PQQET9HGN
 
 # Comments
-disqus: yes
-disqus-shortname: webjeda-demo
+#disqus: yes
+#disqus-shortname: webjeda-demo
 
 #social
 facebook: http://facebook.com/
