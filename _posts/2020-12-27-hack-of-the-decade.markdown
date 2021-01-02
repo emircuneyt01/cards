@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Hack of the decade"
+title:  "Hack of the decade - Solarwinds"
 categories: jekyll update
 image: /images/solarwinds.png
 categories: two
