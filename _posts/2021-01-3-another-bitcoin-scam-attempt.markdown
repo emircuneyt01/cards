@@ -20,6 +20,6 @@ And then, `Twtich` immediately banned the channel, but for now we don't have acc
 
 ![scam]({{site.baseurl}}/images/elonscampng.png)
 
-We will continue to search about if any people got scammed.
+We will continue to search if any people got scammed by this trick.
 
 
