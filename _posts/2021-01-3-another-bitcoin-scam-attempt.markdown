@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Another Bitcoin Scam, this time in Twitch"
+title:  "Another Bitcoin Scam, this time on Twitch"
 categories: jekyll update
 image: /images/elon2.png
 ---
