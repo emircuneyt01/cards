@@ -21,7 +21,7 @@ By joining us;
 
 -You can help the tech community!
 
-We are looking forward your mails.
+We are looking forward your mail.
 
 
 **HackedButHow**
